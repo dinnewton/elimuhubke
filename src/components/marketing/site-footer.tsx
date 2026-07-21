@@ -29,6 +29,15 @@ export function SiteFooter() {
               Log in
             </Link>
           </div>
+          <div className="space-y-2">
+            <p className="font-medium text-foreground">Legal</p>
+            <Link href="/privacy" className="block hover:text-foreground">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="block hover:text-foreground">
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </div>
       <div className="border-t px-6 py-4 text-center text-xs text-muted-foreground">

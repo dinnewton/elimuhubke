@@ -92,6 +92,17 @@ export function SignupTeacherForm() {
           <Button type="submit" className="w-full" disabled={pending}>
             {pending ? "Creating account..." : "Create account"}
           </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            By creating an account you agree to Tusome&apos;s{" "}
+            <Link href="/terms" className="underline hover:text-foreground">
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="underline hover:text-foreground">
+              Privacy Policy
+            </Link>
+            .
+          </p>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Already have an account?{" "}

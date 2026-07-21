@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { sendEmail, payoutPaidEmail } from "@/lib/email";
+import { formatDate, formatKES } from "@/lib/format";
 
 type B2CResultBody = {
   Result: {
@@ -20,6 +22,7 @@ export async function POST(req: Request) {
 
   const payout = await db.payout.findUnique({
     where: { mpesaConversationId: result.ConversationID },
+    include: { teacher: { include: { user: true } } },
   });
   if (!payout) {
     return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
@@ -35,6 +38,15 @@ export async function POST(req: Request) {
         resultDescription: result.ResultDesc,
       },
     });
+
+    await sendEmail({
+      to: payout.teacher.user.email,
+      subject: "You've been paid on Tusome",
+      html: payoutPaidEmail({
+        weekRangeText: `${formatDate(payout.weekStart)} – ${formatDate(payout.weekEnd)}`,
+        amountText: formatKES(payout.netKES),
+      }),
+    }).catch((err) => console.error("Failed to send payout email:", err));
   } else {
     await db.payout.update({
       where: { id: payout.id },

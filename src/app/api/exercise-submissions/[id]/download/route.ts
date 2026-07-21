@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { isBookingParticipant } from "@/lib/booking-access";
-
-const SUBMISSIONS_DIR = path.join(process.cwd(), "uploads", "submissions");
+import { readStoredFile } from "@/lib/storage";
 
 export async function GET(
   _req: Request,
@@ -30,7 +28,7 @@ export async function GET(
   }
 
   try {
-    const bytes = await readFile(path.join(SUBMISSIONS_DIR, submission.fileUrl));
+    const bytes = await readStoredFile(submission.fileUrl);
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
         "Content-Type": "application/octet-stream",

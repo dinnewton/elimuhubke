@@ -2,20 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { randomUUID } from "node:crypto";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { initiateStkPush } from "@/lib/mpesa";
 import { failPayment } from "@/lib/payments";
+import { storeFile } from "@/lib/storage";
 import {
   purchaseDocumentSchema,
   uploadDocumentSchema,
 } from "@/lib/validation-booking";
 import type { ActionState } from "@/lib/actions/types";
 
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "documents");
 const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20MB
 
 export async function purchaseDocumentAction(
@@ -131,11 +128,7 @@ export async function uploadDocumentAction(
     return { error: "Add this subject to your profile before uploading for it." };
   }
 
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  const ext = path.extname(file.name) || "";
-  const storedName = `${randomUUID()}${ext}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(UPLOAD_DIR, storedName), bytes);
+  const key = await storeFile("documents", file);
 
   await db.document.create({
     data: {
@@ -143,7 +136,7 @@ export async function uploadDocumentAction(
       subjectId: parsed.data.subjectId,
       title: parsed.data.title,
       description: parsed.data.description,
-      fileUrl: storedName,
+      fileUrl: key,
       fileSizeBytes: file.size,
       priceKES: parsed.data.priceKES,
     },

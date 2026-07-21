@@ -1,26 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { randomUUID } from "node:crypto";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
+import { storeFile } from "@/lib/storage";
 import { createExerciseSchema, submitExerciseSchema } from "@/lib/validation-booking";
 import type { ActionState } from "@/lib/actions/types";
 
-const EXERCISES_DIR = path.join(process.cwd(), "uploads", "exercises");
-const SUBMISSIONS_DIR = path.join(process.cwd(), "uploads", "submissions");
 const MAX_FILE_BYTES = 20 * 1024 * 1024; // 20MB
-
-async function storeUpload(dir: string, file: File) {
-  await mkdir(dir, { recursive: true });
-  const ext = path.extname(file.name) || "";
-  const storedName = `${randomUUID()}${ext}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(dir, storedName), bytes);
-  return storedName;
-}
 
 export async function createExerciseAction(
   _prevState: ActionState,
@@ -55,7 +42,7 @@ export async function createExerciseAction(
     if (file.size > MAX_FILE_BYTES) {
       return { error: "File is too large (max 20MB)." };
     }
-    fileUrl = await storeUpload(EXERCISES_DIR, file);
+    fileUrl = await storeFile("exercises", file);
     fileSizeBytes = file.size;
   }
 
@@ -109,7 +96,7 @@ export async function submitExerciseResponseAction(
     return { error: "File is too large (max 20MB)." };
   }
 
-  const fileUrl = await storeUpload(SUBMISSIONS_DIR, file);
+  const fileUrl = await storeFile("submissions", file);
 
   await db.exerciseSubmission.create({
     data: {

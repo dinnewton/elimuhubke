@@ -2,6 +2,8 @@ import "server-only";
 import { db } from "@/lib/db";
 import { getPlatformSettings } from "@/lib/platform-settings";
 import { initiateB2CPayment, mpesaMockMode } from "@/lib/mpesa";
+import { sendEmail, payoutPaidEmail } from "@/lib/email";
+import { formatDate, formatKES } from "@/lib/format";
 
 // Weekly payouts run for the most recently completed Mon 00:00 -> Mon 00:00 window.
 export function previousWeekWindow(asOf = new Date()) {
@@ -113,6 +115,17 @@ export async function runWeeklyPayouts(): Promise<PayoutRunSummary> {
           paidAt: mpesaMockMode ? new Date() : null,
         },
       });
+
+      if (mpesaMockMode) {
+        await sendEmail({
+          to: teacher.user.email,
+          subject: "You've been paid on Tusome",
+          html: payoutPaidEmail({
+            weekRangeText: `${formatDate(weekStart)} – ${formatDate(weekEnd)}`,
+            amountText: formatKES(netKES),
+          }),
+        }).catch((err) => console.error("Failed to send payout email:", err));
+      }
     } catch (err) {
       await db.payout.update({
         where: { id: payout.id },

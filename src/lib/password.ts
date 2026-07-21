@@ -1,4 +1,4 @@
-import { randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 
 const scryptAsync = promisify(scrypt);
@@ -20,4 +20,11 @@ export async function verifyPassword(
   const derivedKey = (await scryptAsync(password, salt, KEY_LENGTH)) as Buffer;
   if (derivedKey.length !== keyBuffer.length) return false;
   return timingSafeEqual(derivedKey, keyBuffer);
+}
+
+// Password reset tokens are high-entropy random values, not user-chosen
+// secrets, so a plain SHA-256 digest (not scrypt) is sufficient here —
+// we only need to avoid storing the raw, emailable token in the database.
+export function hashToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }

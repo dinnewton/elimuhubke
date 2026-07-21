@@ -1,5 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
+import { sendEmail, bookingConfirmedEmail, documentPurchaseEmail } from "@/lib/email";
+import { formatDateTime, formatKES } from "@/lib/format";
 
 export async function confirmPaymentSuccess(
   paymentId: string,
@@ -27,6 +29,51 @@ export async function confirmPaymentSuccess(
     // Document purchases only require the Payment to flip to SUCCESS —
     // access is granted by the existence of the DocumentPurchase row.
   });
+
+  await sendPaymentConfirmationEmail(payment).catch((err) =>
+    console.error("Failed to send payment confirmation email:", err)
+  );
+}
+
+async function sendPaymentConfirmationEmail(payment: { purpose: string; bookingId: string | null; documentPurchaseId: string | null; amountKES: number }) {
+  if (payment.purpose === "BOOKING" && payment.bookingId) {
+    const booking = await db.booking.findUnique({
+      where: { id: payment.bookingId },
+      include: {
+        student: { include: { user: true } },
+        teacher: { include: { user: true } },
+        subject: true,
+        availability: true,
+      },
+    });
+    if (!booking) return;
+    await sendEmail({
+      to: booking.student.user.email,
+      subject: "Your Tusome session is confirmed",
+      html: bookingConfirmedEmail({
+        subjectName: booking.subject.name,
+        otherPartyName: booking.teacher.user.name,
+        whenText: formatDateTime(booking.availability.startsAt),
+        amountText: formatKES(payment.amountKES),
+      }),
+    });
+  }
+
+  if (payment.purpose === "DOCUMENT" && payment.documentPurchaseId) {
+    const purchase = await db.documentPurchase.findUnique({
+      where: { id: payment.documentPurchaseId },
+      include: { document: true, student: { include: { user: true } } },
+    });
+    if (!purchase) return;
+    await sendEmail({
+      to: purchase.student.user.email,
+      subject: "Your Tusome purchase is confirmed",
+      html: documentPurchaseEmail({
+        title: purchase.document.title,
+        amountText: formatKES(payment.amountKES),
+      }),
+    });
+  }
 }
 
 export async function failPayment(paymentId: string, reason: string) {

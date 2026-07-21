@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
-import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-
-const UPLOAD_DIR = path.join(process.cwd(), "uploads", "documents");
+import { readStoredFile } from "@/lib/storage";
 
 export async function GET(
   _req: Request,
@@ -42,8 +40,7 @@ export async function GET(
   }
 
   try {
-    const filePath = path.join(UPLOAD_DIR, document.fileUrl);
-    const bytes = await readFile(filePath);
+    const bytes = await readStoredFile(document.fileUrl);
     return new NextResponse(new Uint8Array(bytes), {
       headers: {
         "Content-Type": "application/octet-stream",

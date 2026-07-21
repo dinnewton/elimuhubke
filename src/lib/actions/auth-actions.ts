@@ -1,15 +1,21 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { randomBytes } from "node:crypto";
 import { db } from "@/lib/db";
-import { hashPassword, verifyPassword } from "@/lib/password";
+import { hashPassword, hashToken, verifyPassword } from "@/lib/password";
 import { createSession, deleteSession, dashboardPathForRole } from "@/lib/auth";
+import { sendEmail, passwordResetEmail } from "@/lib/email";
 import {
   loginSchema,
+  requestPasswordResetSchema,
+  resetPasswordSchema,
   studentSignupSchema,
   teacherSignupSchema,
 } from "@/lib/validation";
 import type { ActionState } from "@/lib/actions/types";
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
 export async function signupStudentAction(
   _prevState: ActionState,
@@ -132,5 +138,83 @@ export async function loginAction(
 
 export async function logoutAction() {
   await deleteSession();
+  redirect("/login");
+}
+
+export async function requestPasswordResetAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = requestPasswordResetSchema.safeParse({
+    email: formData.get("email"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const user = await db.user.findUnique({ where: { email: parsed.data.email } });
+
+  // Always report success, even if no account matches — prevents leaking
+  // which emails are registered.
+  if (user) {
+    const rawToken = randomBytes(32).toString("hex");
+    await db.passwordResetToken.create({
+      data: {
+        userId: user.id,
+        tokenHash: hashToken(rawToken),
+        expiresAt: new Date(Date.now() + RESET_TOKEN_TTL_MS),
+      },
+    });
+
+    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${rawToken}`;
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your Tusome password",
+      html: passwordResetEmail(resetUrl),
+    });
+  }
+
+  return { success: true };
+}
+
+export async function resetPasswordAction(
+  _prevState: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = resetPasswordSchema.safeParse({
+    token: formData.get("token"),
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors };
+  }
+
+  const tokenHash = hashToken(parsed.data.token);
+  const resetToken = await db.passwordResetToken.findUnique({
+    where: { tokenHash },
+  });
+
+  if (
+    !resetToken ||
+    resetToken.usedAt ||
+    resetToken.expiresAt < new Date()
+  ) {
+    return { error: "This reset link is invalid or has expired. Request a new one." };
+  }
+
+  const passwordHash = await hashPassword(parsed.data.password);
+
+  await db.$transaction([
+    db.user.update({
+      where: { id: resetToken.userId },
+      data: { passwordHash },
+    }),
+    db.passwordResetToken.update({
+      where: { id: resetToken.id },
+      data: { usedAt: new Date() },
+    }),
+  ]);
+
   redirect("/login");
 }

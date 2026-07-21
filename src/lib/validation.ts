@@ -51,6 +51,21 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+export const requestPasswordResetSchema = z.object({
+  email: z.email("Enter a valid email"),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().min(1),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string().min(1, "Confirm your new password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
 export const CBC_GRADE_LEVELS = [
   "PP1",
   "PP2",
