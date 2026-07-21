@@ -1,0 +1,359 @@
+// Tusome — Kenyan Learning Management Platform
+// Prisma schema: users, curricula, tutoring bookings, document marketplace,
+// M-Pesa payments, and weekly teacher payouts.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Enums ----------
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum Curriculum {
+  CBC // Competency Based Curriculum (Kenya)
+  EIGHT_FOUR_FOUR // Old 8-4-4 system (Kenya)
+  IGCSE // British / Cambridge international (IGCSE & A-Level)
+  AMERICAN // American curriculum (K-12 / Common Core)
+  IB // International Baccalaureate (PYP / MYP / DP)
+  SWAHILI_FOREIGN // Swahili for non-native / international learners
+}
+
+enum TeacherVerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum BookingStatus {
+  AWAITING_PAYMENT
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentPurpose {
+  BOOKING
+  DOCUMENT
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+enum PayoutLineType {
+  BOOKING
+  DOCUMENT_SALE
+}
+
+// ---------- Core identity ----------
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  phone        String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+
+  @@index([role])
+}
+
+model StudentProfile {
+  id         String     @id @default(cuid())
+  userId     String     @unique
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  curriculum Curriculum
+  gradeLevel String // e.g. "Grade 6" (CBC) or "Form 2" (8-4-4)
+
+  bookingsAsStudent Booking[]
+  purchases         DocumentPurchase[]
+  payments          Payment[]
+
+  createdAt DateTime @default(now())
+}
+
+model TeacherProfile {
+  id                    String                     @id @default(cuid())
+  userId                String                     @unique
+  user                  User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio                   String?
+  curricula             Curriculum[] // curricula they can teach
+  verificationStatus    TeacherVerificationStatus  @default(PENDING)
+  mpesaPayoutPhone      String? // defaults to user.phone if null
+  ratingAverage         Float                      @default(0)
+  ratingCount            Int                       @default(0)
+
+  subjects     TeacherSubject[]
+  availability Availability[]
+  bookings     Booking[]
+  documents    Document[]
+  payouts      Payout[]
+
+  createdAt DateTime @default(now())
+}
+
+// ---------- Curriculum & subjects ----------
+
+model Subject {
+  id         String     @id @default(cuid())
+  name       String // e.g. "Mathematics"
+  curriculum Curriculum
+  gradeLevel String // e.g. "Grade 6", "Form 2"
+
+  teacherLinks TeacherSubject[]
+  documents    Document[]
+  bookings     Booking[]
+  rateCard     RateCard?
+
+  @@unique([name, curriculum, gradeLevel])
+  @@index([curriculum, gradeLevel])
+}
+
+model TeacherSubject {
+  id        String         @id @default(cuid())
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subjectId String
+  subject   Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, subjectId])
+}
+
+// The platform (not teachers) sets the hourly tutoring rate per subject/level.
+model RateCard {
+  id            String   @id @default(cuid())
+  subjectId     String   @unique
+  subject       Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  hourlyRateKES Int // amount in whole KES
+  updatedAt     DateTime @updatedAt
+}
+
+// ---------- Availability & bookings (live tutoring) ----------
+
+model Availability {
+  id        String         @id @default(cuid())
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  startsAt  DateTime
+  endsAt    DateTime
+  isBooked  Boolean        @default(false)
+
+  booking Booking?
+
+  @@index([teacherId, startsAt])
+}
+
+model Booking {
+  id             String         @id @default(cuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  teacherId      String
+  teacher        TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subjectId      String
+  subject        Subject        @relation(fields: [subjectId], references: [id])
+  availabilityId String         @unique
+  availability   Availability   @relation(fields: [availabilityId], references: [id])
+
+  durationHours   Float // e.g. 1.5
+  hourlyRateKES   Int // rate captured at booking time
+  totalKES        Int // durationHours * hourlyRateKES
+  status          BookingStatus @default(AWAITING_PAYMENT)
+  videoRoomSlug   String        @unique @default(cuid())
+  studentJoinedAt DateTime?
+  teacherJoinedAt DateTime?
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+
+  payment       Payment?
+  payoutLineItem PayoutLineItem?
+  exercises      Exercise[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([teacherId, status])
+  @@index([studentId, status])
+}
+
+// ---------- Exercises exchanged between teacher and student for a booking ----------
+
+model Exercise {
+  id           String   @id @default(cuid())
+  bookingId    String
+  booking      Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  title        String
+  instructions String?
+  fileUrl        String? // storage path, optional (instructions-only exercises allowed)
+  fileSizeBytes  Int?
+
+  submissions ExerciseSubmission[]
+
+  createdAt DateTime @default(now())
+
+  @@index([bookingId])
+}
+
+model ExerciseSubmission {
+  id            String   @id @default(cuid())
+  exerciseId    String
+  exercise      Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  note          String?
+  fileUrl       String // storage path
+  fileSizeBytes Int
+
+  createdAt DateTime @default(now())
+
+  @@index([exerciseId])
+}
+
+// ---------- Document marketplace ----------
+
+model Document {
+  id          String     @id @default(cuid())
+  teacherId   String
+  teacher     TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  subjectId   String
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  title       String
+  description String?
+  fileUrl     String // storage path
+  fileSizeBytes Int
+  priceKES    Int
+  isPublished Boolean    @default(true)
+
+  purchases DocumentPurchase[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([subjectId, isPublished])
+  @@index([teacherId])
+}
+
+model DocumentPurchase {
+  id         String         @id @default(cuid())
+  documentId String
+  document   Document       @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  priceKES   Int // price captured at purchase time
+
+  payment        Payment?
+  payoutLineItem PayoutLineItem?
+
+  createdAt DateTime @default(now())
+
+  @@unique([documentId, studentId])
+}
+
+// ---------- Payments (M-Pesa STK Push from students) ----------
+
+model Payment {
+  id      String         @id @default(cuid())
+  purpose PaymentPurpose
+
+  studentId String
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  bookingId String?  @unique
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  documentPurchaseId String?           @unique
+  documentPurchase   DocumentPurchase? @relation(fields: [documentPurchaseId], references: [id], onDelete: Cascade)
+
+  amountKES Int
+  phone     String // M-Pesa phone number payment was requested from
+  status    PaymentStatus @default(PENDING)
+
+  mpesaCheckoutRequestId String? @unique
+  mpesaMerchantRequestId String?
+  mpesaReceiptNumber     String?
+  resultDescription      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+// ---------- Weekly teacher payouts (M-Pesa B2C) ----------
+
+model Payout {
+  id        String         @id @default(cuid())
+  teacherId String
+  teacher   TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  weekStart DateTime
+  weekEnd   DateTime
+
+  grossKES         Int
+  commissionPercent Float
+  commissionKES    Int
+  netKES           Int
+
+  status PayoutStatus @default(PENDING)
+  phone  String // payout destination at time of payout
+
+  mpesaConversationId       String? @unique
+  mpesaOriginatorConversationId String?
+  mpesaTransactionId        String?
+  resultDescription         String?
+
+  lineItems PayoutLineItem[]
+
+  createdAt DateTime  @default(now())
+  paidAt    DateTime?
+
+  @@unique([teacherId, weekStart, weekEnd])
+  @@index([status])
+}
+
+model PayoutLineItem {
+  id      String         @id @default(cuid())
+  payoutId String
+  payout   Payout         @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  type    PayoutLineType
+  amountKES Int
+
+  bookingId String?  @unique
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+
+  documentPurchaseId String?           @unique
+  documentPurchase   DocumentPurchase? @relation(fields: [documentPurchaseId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+// ---------- Platform-wide settings (singleton row) ----------
+
+model PlatformSettings {
+  id                 String @id @default("singleton")
+  commissionPercent  Float  @default(20)
+}
