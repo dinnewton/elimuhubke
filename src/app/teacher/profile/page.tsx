@@ -40,7 +40,7 @@ export default async function TeacherProfilePage() {
       {teacher.verificationStatus === "PENDING" && (
         <Card className="border-accent/40 bg-accent/10">
           <CardContent className="p-4 text-sm">
-            Your account is awaiting verification by Tusome admins. You can set
+            Your account is awaiting verification by ElimuHubKE admins. You can set
             up your profile and subjects in the meantime — you&apos;ll appear
             in student search once verified.
           </CardContent>
@@ -60,7 +60,7 @@ export default async function TeacherProfilePage() {
         <CardHeader>
           <CardTitle className="text-base">Subjects you teach</CardTitle>
           <CardDescription>
-            Rates are set by Tusome per subject and grade — you&apos;ll see the
+            Rates are set by ElimuHubKE per subject and grade — you&apos;ll see the
             rate on each booking.
           </CardDescription>
         </CardHeader>

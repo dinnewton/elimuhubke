@@ -36,7 +36,7 @@ export default async function TeacherEarningsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Earnings</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Paid out every week via M-Pesa, minus Tusome&apos;s commission.
+          Paid out every week via M-Pesa, minus ElimuHubKE&apos;s commission.
         </p>
       </div>
 

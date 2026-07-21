@@ -100,8 +100,8 @@ export async function createBookingAction(
     const stk = await initiateStkPush({
       phone,
       amountKES: totalKES,
-      accountReference: `Tusome-${booking.id.slice(-8)}`,
-      transactionDesc: `Tusome tutoring: ${subject.name}`,
+      accountReference: `ElimuHubKE-${booking.id.slice(-8)}`,
+      transactionDesc: `ElimuHubKE tutoring: ${subject.name}`,
     });
     await db.payment.update({
       where: { id: payment.id },

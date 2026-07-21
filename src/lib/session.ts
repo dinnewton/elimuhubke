@@ -2,7 +2,7 @@ import "server-only";
 import { SignJWT, jwtVerify } from "jose";
 import type { Role } from "@/generated/prisma/client";
 
-const SESSION_COOKIE_NAME = "tusome_session";
+const SESSION_COOKIE_NAME = "elimuhubke_session";
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 function getSecretKey() {

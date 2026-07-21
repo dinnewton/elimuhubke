@@ -35,7 +35,7 @@ export default function Home() {
                 teachers you trust.
               </h1>
               <p className="max-w-lg text-lg text-muted-foreground text-pretty">
-                Tusome connects students across CBC, 8-4-4, IGCSE, American
+                ElimuHubKE connects students across CBC, 8-4-4, IGCSE, American
                 and IB curricula with verified teachers for live, hourly
                 tutoring — plus Swahili lessons for international visitors
                 and expats, and a marketplace of notes and past papers. Pay
@@ -46,7 +46,7 @@ export default function Home() {
                   Find a teacher <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button size="lg" variant="outline" render={<Link href="/signup/teacher" />}>
-                  Teach on Tusome
+                  Teach on ElimuHubKE
                 </Button>
               </div>
               <div className="flex items-center gap-6 pt-2 text-sm text-muted-foreground">
@@ -103,7 +103,7 @@ export default function Home() {
           <div className="mx-auto max-w-6xl px-6">
             <div className="max-w-2xl">
               <h2 className="text-3xl font-semibold tracking-tight">
-                How Tusome works
+                How ElimuHubKE works
               </h2>
               <p className="mt-3 text-muted-foreground">
                 Three steps from “I don&apos;t get this topic” to a confirmed
@@ -120,7 +120,7 @@ export default function Home() {
                 {
                   icon: CalendarCheck,
                   title: "Book an hourly slot",
-                  body: "See a teacher's open availability and book the hour that works — rates are fixed by Tusome, so pricing is always fair.",
+                  body: "See a teacher's open availability and book the hour that works — rates are fixed by ElimuHubKE, so pricing is always fair.",
                 },
                 {
                   icon: Video,
@@ -208,7 +208,7 @@ export default function Home() {
                 Teach, get booked, get paid — every week.
               </h2>
               <p className="text-muted-foreground">
-                Set your availability and upload revision materials. Tusome
+                Set your availability and upload revision materials. ElimuHubKE
                 sets fair hourly rates per subject and grade so you never
                 have to negotiate. Every Monday, your earnings from the
                 past week — tutoring hours and document sales, minus our
@@ -267,7 +267,7 @@ export default function Home() {
               Ready to learn, or ready to teach?
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-primary-foreground/90">
-              Join Tusome today — set up takes less than two minutes.
+              Join ElimuHubKE today — set up takes less than two minutes.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button size="lg" variant="secondary" render={<Link href="/signup/student" />}>

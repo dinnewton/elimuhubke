@@ -169,7 +169,7 @@ export async function requestPasswordResetAction(
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password/${rawToken}`;
     await sendEmail({
       to: user.email,
-      subject: "Reset your Tusome password",
+      subject: "Reset your ElimuHubKE password",
       html: passwordResetEmail(resetUrl),
     });
   }

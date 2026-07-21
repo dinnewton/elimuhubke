@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const SESSION_COOKIE_NAME = "tusome_session";
+const SESSION_COOKIE_NAME = "elimuhubke_session";
 const PROTECTED_PREFIXES = ["/student", "/teacher", "/admin"];
 
 // Optimistic check only: confirms a session cookie exists so logged-out users

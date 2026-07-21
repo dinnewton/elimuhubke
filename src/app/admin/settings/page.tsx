@@ -18,7 +18,7 @@ export default async function AdminSettingsPage() {
         <CardHeader>
           <CardTitle className="text-base">Commission</CardTitle>
           <CardDescription>
-            Percentage Tusome keeps from every teacher&apos;s tutoring hours and
+            Percentage ElimuHubKE keeps from every teacher&apos;s tutoring hours and
             document sales before the weekly M-Pesa payout.
           </CardDescription>
         </CardHeader>

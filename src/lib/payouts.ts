@@ -101,7 +101,7 @@ export async function runWeeklyPayouts(): Promise<PayoutRunSummary> {
       const b2c = await initiateB2CPayment({
         phone,
         amountKES: netKES,
-        remarks: `Tusome weekly payout`,
+        remarks: `ElimuHubKE weekly payout`,
         occasion: `Payout-${payout.id.slice(-8)}`,
       });
 
@@ -119,7 +119,7 @@ export async function runWeeklyPayouts(): Promise<PayoutRunSummary> {
       if (mpesaMockMode) {
         await sendEmail({
           to: teacher.user.email,
-          subject: "You've been paid on Tusome",
+          subject: "You've been paid on ElimuHubKE",
           html: payoutPaidEmail({
             weekRangeText: `${formatDate(weekStart)} – ${formatDate(weekEnd)}`,
             amountText: formatKES(netKES),

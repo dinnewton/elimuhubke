@@ -49,7 +49,7 @@ async function sendPaymentConfirmationEmail(payment: { purpose: string; bookingI
     if (!booking) return;
     await sendEmail({
       to: booking.student.user.email,
-      subject: "Your Tusome session is confirmed",
+      subject: "Your ElimuHubKE session is confirmed",
       html: bookingConfirmedEmail({
         subjectName: booking.subject.name,
         otherPartyName: booking.teacher.user.name,
@@ -67,7 +67,7 @@ async function sendPaymentConfirmationEmail(payment: { purpose: string; bookingI
     if (!purchase) return;
     await sendEmail({
       to: purchase.student.user.email,
-      subject: "Your Tusome purchase is confirmed",
+      subject: "Your ElimuHubKE purchase is confirmed",
       html: documentPurchaseEmail({
         title: purchase.document.title,
         amountText: formatKES(payment.amountKES),

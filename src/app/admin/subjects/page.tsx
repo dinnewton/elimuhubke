@@ -16,7 +16,7 @@ export default async function AdminSubjectsPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Subjects &amp; rates</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tusome sets the hourly tutoring rate for every subject and grade —
+          ElimuHubKE sets the hourly tutoring rate for every subject and grade —
           teachers cannot change it.
         </p>
       </div>

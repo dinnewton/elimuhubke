@@ -11,7 +11,7 @@ export function Logo({ className }: { className?: string }) {
       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
         <GraduationCap className="h-5 w-5" />
       </span>
-      <span className="text-lg">Tusome</span>
+      <span className="text-lg">ElimuHubKE</span>
     </Link>
   );
 }

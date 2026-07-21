@@ -1,7 +1,7 @@
 import { SiteNav } from "@/components/marketing/site-nav";
 import { SiteFooter } from "@/components/marketing/site-footer";
 
-export const metadata = { title: "Privacy Policy — Tusome" };
+export const metadata = { title: "Privacy Policy — ElimuHubKE" };
 
 export default function PrivacyPolicyPage() {
   return (
@@ -13,7 +13,7 @@ export default function PrivacyPolicyPage() {
 
         <div className="prose prose-sm mt-8 max-w-none space-y-6 text-sm leading-relaxed text-muted-foreground [&>h2]:mt-8 [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:text-foreground [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1">
           <p>
-            Tusome (&quot;we&quot;, &quot;us&quot;) operates a platform connecting
+            ElimuHubKE (&quot;we&quot;, &quot;us&quot;) operates a platform connecting
             students and teachers for live tutoring, revision materials, and
             Swahili lessons. This policy explains what personal data we
             collect, why, and how it&apos;s handled, in line with Kenya&apos;s
@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
           <h2>Who we share it with</h2>
           <ul>
             <li><strong>Safaricom (M-Pesa/Daraja)</strong> — to process payments and payouts.</li>
-            <li><strong>Jitsi Meet</strong> — live video sessions run on Jitsi&apos;s video infrastructure; session audio/video is not stored by Tusome.</li>
+            <li><strong>Jitsi Meet</strong> — live video sessions run on Jitsi&apos;s video infrastructure; session audio/video is not stored by ElimuHubKE.</li>
             <li><strong>Our email provider</strong> — to deliver transactional emails (password resets, receipts, payout notices).</li>
             <li><strong>Our cloud hosting and storage providers</strong> — to run the platform and store uploaded documents securely.</li>
           </ul>
@@ -63,7 +63,7 @@ export default function PrivacyPolicyPage() {
           </p>
 
           <h2>Contact</h2>
-          <p>Questions about this policy? Reach us at privacy@tusome.com.</p>
+          <p>Questions about this policy? Reach us at privacy@elimuhubke.com.</p>
         </div>
       </main>
       <SiteFooter />

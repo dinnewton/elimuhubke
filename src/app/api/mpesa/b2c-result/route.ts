@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     await sendEmail({
       to: payout.teacher.user.email,
-      subject: "You've been paid on Tusome",
+      subject: "You've been paid on ElimuHubKE",
       html: payoutPaidEmail({
         weekRangeText: `${formatDate(payout.weekStart)} – ${formatDate(payout.weekEnd)}`,
         amountText: formatKES(payout.netKES),

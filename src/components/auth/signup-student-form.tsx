@@ -115,7 +115,7 @@ export function SignupStudentForm() {
             {pending ? "Creating account..." : "Create account"}
           </Button>
           <p className="text-center text-xs text-muted-foreground">
-            By creating an account you agree to Tusome&apos;s{" "}
+            By creating an account you agree to ElimuHubKE&apos;s{" "}
             <Link href="/terms" className="underline hover:text-foreground">
               Terms
             </Link>{" "}

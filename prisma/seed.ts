@@ -54,11 +54,11 @@ async function main() {
 
   const adminPassword = await hashPassword("Admin1234!");
   await db.user.upsert({
-    where: { email: "admin@tusome.com" },
+    where: { email: "admin@elimuhubke.com" },
     update: {},
     create: {
-      name: "Tusome Admin",
-      email: "admin@tusome.com",
+      name: "ElimuHubKE Admin",
+      email: "admin@elimuhubke.com",
       phone: "254700000001",
       passwordHash: adminPassword,
       role: "ADMIN",
@@ -67,11 +67,11 @@ async function main() {
 
   const teacherPassword = await hashPassword("Teacher1234!");
   const teacherUser = await db.user.upsert({
-    where: { email: "teacher@tusome.com" },
+    where: { email: "teacher@elimuhubke.com" },
     update: {},
     create: {
       name: "Faith Wanjiru",
-      email: "teacher@tusome.com",
+      email: "teacher@elimuhubke.com",
       phone: "254700000002",
       passwordHash: teacherPassword,
       role: "TEACHER",
@@ -141,11 +141,11 @@ async function main() {
   // Second teacher: Swahili for international visitors, expats & diaspora
   const swahiliTeacherPassword = await hashPassword("Teacher1234!");
   const swahiliTeacherUser = await db.user.upsert({
-    where: { email: "swahili@tusome.com" },
+    where: { email: "swahili@elimuhubke.com" },
     update: {},
     create: {
       name: "Amina Hassan",
-      email: "swahili@tusome.com",
+      email: "swahili@elimuhubke.com",
       phone: "254700000004",
       passwordHash: swahiliTeacherPassword,
       role: "TEACHER",
@@ -215,11 +215,11 @@ async function main() {
 
   const studentPassword = await hashPassword("Student1234!");
   await db.user.upsert({
-    where: { email: "student@tusome.com" },
+    where: { email: "student@elimuhubke.com" },
     update: {},
     create: {
       name: "Brian Otieno",
-      email: "student@tusome.com",
+      email: "student@elimuhubke.com",
       phone: "254700000003",
       passwordHash: studentPassword,
       role: "STUDENT",
@@ -232,11 +232,11 @@ async function main() {
   // International visitor learning Swahili
   const internationalStudentPassword = await hashPassword("Student1234!");
   await db.user.upsert({
-    where: { email: "visitor@tusome.com" },
+    where: { email: "visitor@elimuhubke.com" },
     update: {},
     create: {
       name: "James Miller",
-      email: "visitor@tusome.com",
+      email: "visitor@elimuhubke.com",
       phone: "254700000005",
       passwordHash: internationalStudentPassword,
       role: "STUDENT",
@@ -247,11 +247,11 @@ async function main() {
   });
 
   console.log("\nSeed complete. Demo logins:");
-  console.log("  Admin:              admin@tusome.com    / Admin1234!");
-  console.log("  Teacher (CBC/8-4-4): teacher@tusome.com / Teacher1234!");
-  console.log("  Teacher (Swahili):   swahili@tusome.com / Teacher1234!");
-  console.log("  Student (CBC):       student@tusome.com / Student1234!");
-  console.log("  Student (visitor):   visitor@tusome.com / Student1234!\n");
+  console.log("  Admin:              admin@elimuhubke.com    / Admin1234!");
+  console.log("  Teacher (CBC/8-4-4): teacher@elimuhubke.com / Teacher1234!");
+  console.log("  Teacher (Swahili):   swahili@elimuhubke.com / Teacher1234!");
+  console.log("  Student (CBC):       student@elimuhubke.com / Student1234!");
+  console.log("  Student (visitor):   visitor@elimuhubke.com / Student1234!\n");
 }
 
 main()

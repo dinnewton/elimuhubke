@@ -75,8 +75,8 @@ export async function purchaseDocumentAction(
     const stk = await initiateStkPush({
       phone,
       amountKES: document.priceKES,
-      accountReference: `Tusome-${purchase.id.slice(-8)}`,
-      transactionDesc: `Tusome document: ${document.title}`,
+      accountReference: `ElimuHubKE-${purchase.id.slice(-8)}`,
+      transactionDesc: `ElimuHubKE document: ${document.title}`,
     });
     await db.payment.update({
       where: { id: payment.id },

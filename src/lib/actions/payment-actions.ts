@@ -61,8 +61,8 @@ export async function retryPaymentAction(paymentId: string) {
     const stk = await initiateStkPush({
       phone: payment.phone,
       amountKES: payment.amountKES,
-      accountReference: `Tusome-${paymentId.slice(-8)}`,
-      transactionDesc: "Tusome payment",
+      accountReference: `ElimuHubKE-${paymentId.slice(-8)}`,
+      transactionDesc: "ElimuHubKE payment",
     });
     await db.payment.update({
       where: { id: paymentId },

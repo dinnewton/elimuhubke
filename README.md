@@ -1,4 +1,4 @@
-# Tusome
+# ElimuHubKE
 
 A learning platform connecting Kenyan and international students with
 teachers for live, hourly tutoring — CBC, 8-4-4, IGCSE, American and IB
@@ -52,8 +52,8 @@ Open http://localhost:3000.
 ### Environment
 
 Copy the values in `.env` (already configured for the local Postgres role
-created during setup: `tusome` / `tusome_dev_pw` on `localhost:5433`,
-database `tusome_dev`). Key variables:
+created during setup: `elimuhubke` / `elimuhubke_dev_pw` on `localhost:5433`,
+database `elimuhubke_dev`). Key variables:
 
 | Variable | Purpose |
 | --- | --- |
@@ -79,11 +79,11 @@ mock mode turns off automatically.
 
 `npx prisma db seed` creates:
 
-- Admin — `admin@tusome.com` / `Admin1234!`
-- Teacher, CBC/8-4-4 (verified) — `teacher@tusome.com` / `Teacher1234!`
-- Teacher, Swahili for foreigners (verified) — `swahili@tusome.com` / `Teacher1234!`
-- Student, CBC — `student@tusome.com` / `Student1234!`
-- Student, international visitor — `visitor@tusome.com` / `Student1234!`
+- Admin — `admin@elimuhubke.com` / `Admin1234!`
+- Teacher, CBC/8-4-4 (verified) — `teacher@elimuhubke.com` / `Teacher1234!`
+- Teacher, Swahili for foreigners (verified) — `swahili@elimuhubke.com` / `Teacher1234!`
+- Student, CBC — `student@elimuhubke.com` / `Student1234!`
+- Student, international visitor — `visitor@elimuhubke.com` / `Student1234!`
 - Subjects with rate cards across all six curricula, sample availability, and
   published documents for both teachers.
 
@@ -117,7 +117,7 @@ The repo is already git-initialized locally. Create an empty repository on
 GitHub, then:
 
 ```bash
-git remote add origin https://github.com/<your-username>/tusome.git
+git remote add origin https://github.com/<your-username>/elimuhubke.git
 git branch -M main
 git push -u origin main
 ```
@@ -134,13 +134,13 @@ git push -u origin main
 ### 3. Create a Cloudflare R2 bucket
 
 1. Sign up at [Cloudflare](https://dash.cloudflare.com) → R2 → **Create bucket**
-   (any name, e.g. `tusome-uploads`).
+   (any name, e.g. `elimuhubke-uploads`).
 2. R2 → **Manage API tokens** → create a token with **Object Read & Write**
    access scoped to that bucket. Note the **Access Key ID**, **Secret Access
    Key**, and your **Account ID** (shown on the R2 overview page).
 3. These become `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_ACCOUNT_ID`,
    and `R2_BUCKET_NAME`. The bucket can stay private — all downloads go
-   through Tusome's own authenticated routes, never directly from R2.
+   through ElimuHubKE's own authenticated routes, never directly from R2.
 
 ### 4. Create a Resend account
 
@@ -149,7 +149,7 @@ git push -u origin main
 2. Without a verified domain, Resend only lets you send to your own account
    email from `onboarding@resend.dev` — fine for testing, too restrictive for
    real users. Once you have a domain (see step 6), verify it in Resend and
-   set `EMAIL_FROM` to an address on it, e.g. `Tusome <noreply@yourdomain.com>`.
+   set `EMAIL_FROM` to an address on it, e.g. `ElimuHubKE <noreply@yourdomain.com>`.
 
 ### 5. Deploy to Vercel
 
@@ -163,7 +163,7 @@ git push -u origin main
    | --- | --- |
    | `DATABASE_URL` | Neon pooled connection string from step 2 |
    | `SESSION_SECRET` | `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
-   | `NEXT_PUBLIC_APP_URL` | Your Vercel URL, e.g. `https://tusome.vercel.app` |
+   | `NEXT_PUBLIC_APP_URL` | Your Vercel URL, e.g. `https://elimuhubke.vercel.app` |
    | `PLATFORM_COMMISSION_PERCENT` | `20` (or your rate) |
    | `PAYOUT_JOB_SECRET` | Another random string from the command above |
    | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | From step 3 |

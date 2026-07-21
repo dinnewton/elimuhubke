@@ -81,7 +81,7 @@ export default async function SessionRoomPage({
     });
   }
 
-  const roomName = `tusome-${slug}`;
+  const roomName = `elimuhubke-${slug}`;
   const displayName = encodeURIComponent(user.name);
 
   return (
@@ -116,7 +116,7 @@ export default async function SessionRoomPage({
         </div>
       </div>
       <iframe
-        title="Tusome live session"
+        title="ElimuHubKE live session"
         src={`https://meet.jit.si/${roomName}#userInfo.displayName=%22${displayName}%22`}
         allow="camera; microphone; fullscreen; display-capture; autoplay"
         className="flex-1 border-0"

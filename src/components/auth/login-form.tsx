@@ -16,7 +16,7 @@ export function LoginForm() {
     <Card>
       <CardHeader>
         <CardTitle>Log in</CardTitle>
-        <CardDescription>Welcome back to Tusome.</CardDescription>
+        <CardDescription>Welcome back to ElimuHubKE.</CardDescription>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">

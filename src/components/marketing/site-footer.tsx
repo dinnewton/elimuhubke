@@ -41,7 +41,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t px-6 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Tusome. Made for Kenyan classrooms.
+        © {new Date().getFullYear()} ElimuHubKE. Made for Kenyan classrooms.
       </div>
     </footer>
   );

@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tusome — Learn Kenya's Curriculum, Live",
+  title: "ElimuHubKE — Learn Kenya's Curriculum, Live",
   description:
-    "Tusome connects learners with verified teachers for live CBC, 8-4-4, IGCSE, American and IB tutoring, plus Swahili lessons for international visitors — paid by the hour via M-Pesa, with a marketplace of teacher-made revision materials.",
+    "ElimuHubKE connects learners with verified teachers for live CBC, 8-4-4, IGCSE, American and IB tutoring, plus Swahili lessons for international visitors — paid by the hour via M-Pesa, with a marketplace of teacher-made revision materials.",
 };
 
 export default function RootLayout({
