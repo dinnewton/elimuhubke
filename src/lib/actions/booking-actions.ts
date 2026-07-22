@@ -7,6 +7,7 @@ import { initiateStkPush } from "@/lib/mpesa";
 import { failPayment } from "@/lib/payments";
 import { createBookingSchema } from "@/lib/validation-booking";
 import type { ActionState } from "@/lib/actions/types";
+import { Prisma } from "@/generated/prisma/client";
 
 export async function createBookingAction(
   _prevState: ActionState,
@@ -88,6 +89,9 @@ export async function createBookingAction(
     return { booking, payment };
   }).catch((err) => {
     if (err instanceof Error && err.message === "SLOT_TAKEN") return null;
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      return null;
+    }
     throw err;
   });
 
