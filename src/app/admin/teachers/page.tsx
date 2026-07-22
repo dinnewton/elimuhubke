@@ -1,7 +1,9 @@
+import { FileText } from "lucide-react";
 import { db } from "@/lib/db";
 import { getTeacherRevenueSummaries } from "@/lib/analytics";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { TeacherVerifyButtons } from "@/components/admin/teacher-verify-buttons";
 import { curriculumLabel, formatDate, formatKES } from "@/lib/format";
 
@@ -17,6 +19,7 @@ export default async function AdminTeachersPage() {
       include: {
         user: true,
         subjects: { include: { subject: true } },
+        qualifications: { orderBy: { createdAt: "desc" } },
       },
       orderBy: { createdAt: "desc" },
     }),
@@ -42,44 +45,70 @@ export default async function AdminTeachersPage() {
           const revenue = revenueByTeacherId.get(teacher.id);
           return (
             <Card key={teacher.id}>
-              <CardContent className="flex flex-wrap items-center justify-between gap-4 p-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium">{teacher.user.name}</p>
-                    <Badge variant={statusVariant[teacher.verificationStatus]}>
-                      {teacher.verificationStatus}
-                    </Badge>
+              <CardContent className="space-y-3 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium">{teacher.user.name}</p>
+                      <Badge variant={statusVariant[teacher.verificationStatus]}>
+                        {teacher.verificationStatus}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {teacher.user.email} · {teacher.user.phone}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Joined {formatDate(teacher.createdAt)}
+                      {revenue &&
+                        ` · ${revenue.sessionsCompleted} sessions · ${revenue.documentsSold} document sales`}
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {teacher.curricula.map((c) => (
+                        <Badge key={c} variant="secondary">
+                          {curriculumLabel(c)}
+                        </Badge>
+                      ))}
+                      {teacher.subjects.map(({ subject }) => (
+                        <Badge key={subject.id} variant="outline">
+                          {subject.name} · {subject.gradeLevel}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {teacher.user.email} · {teacher.user.phone}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Joined {formatDate(teacher.createdAt)}
-                    {revenue &&
-                      ` · ${revenue.sessionsCompleted} sessions · ${revenue.documentsSold} document sales`}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {teacher.curricula.map((c) => (
-                      <Badge key={c} variant="secondary">
-                        {curriculumLabel(c)}
-                      </Badge>
-                    ))}
-                    {teacher.subjects.map(({ subject }) => (
-                      <Badge key={subject.id} variant="outline">
-                        {subject.name} · {subject.gradeLevel}
-                      </Badge>
-                    ))}
+                  <div className="flex items-center gap-4">
+                    {revenue && (
+                      <div className="text-right text-sm">
+                        <p className="font-semibold">{formatKES(revenue.grossKES)}</p>
+                        <p className="text-xs text-muted-foreground">generated</p>
+                      </div>
+                    )}
+                    {teacher.verificationStatus !== "VERIFIED" && (
+                      <TeacherVerifyButtons teacherProfileId={teacher.id} />
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  {revenue && (
-                    <div className="text-right text-sm">
-                      <p className="font-semibold">{formatKES(revenue.grossKES)}</p>
-                      <p className="text-xs text-muted-foreground">generated</p>
+
+                <div className="rounded-lg border border-dashed p-3">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    Qualification documents ({teacher.qualifications.length})
+                  </p>
+                  {teacher.qualifications.length === 0 ? (
+                    <p className="text-xs text-muted-foreground">None uploaded yet.</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {teacher.qualifications.map((doc) => (
+                        <Button
+                          key={doc.id}
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5"
+                          render={<a href={`/api/qualifications/${doc.id}/download`} />}
+                        >
+                          <FileText className="h-3.5 w-3.5" />
+                          {doc.title}
+                        </Button>
+                      ))}
                     </div>
-                  )}
-                  {teacher.verificationStatus !== "VERIFIED" && (
-                    <TeacherVerifyButtons teacherProfileId={teacher.id} />
                   )}
                 </div>
               </CardContent>

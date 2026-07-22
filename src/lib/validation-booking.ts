@@ -42,6 +42,10 @@ export const uploadDocumentSchema = z.object({
   priceKES: z.coerce.number().int().min(20, "Price must be at least KES 20"),
 });
 
+export const uploadQualificationSchema = z.object({
+  title: z.string().trim().min(3, "Enter a title, e.g. \"Bachelor of Education certificate\""),
+});
+
 export const teacherProfileSchema = z.object({
   bio: z.string().trim().max(1000).optional(),
   mpesaPayoutPhone: kenyanPhone.optional().or(z.literal("")),

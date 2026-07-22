@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ProfileForm } from "@/components/teacher/profile-form";
 import { SubjectPicker } from "@/components/teacher/subject-picker";
+import { UploadQualificationForm } from "@/components/teacher/upload-qualification-form";
+import { QualificationList } from "@/components/teacher/qualification-list";
 
 const statusVariant = {
   PENDING: "secondary",
@@ -15,7 +17,10 @@ export default async function TeacherProfilePage() {
   const user = await requireRole("TEACHER");
   const teacher = await db.teacherProfile.findUniqueOrThrow({
     where: { userId: user.id },
-    include: { subjects: true },
+    include: {
+      subjects: true,
+      qualifications: { orderBy: { createdAt: "desc" } },
+    },
   });
 
   const availableSubjects = await db.subject.findMany({
@@ -37,12 +42,12 @@ export default async function TeacherProfilePage() {
         </Badge>
       </div>
 
-      {teacher.verificationStatus === "PENDING" && (
+      {teacher.verificationStatus !== "VERIFIED" && (
         <Card className="border-accent/40 bg-accent/10">
           <CardContent className="p-4 text-sm">
-            Your account is awaiting verification by ElimuHubKE admins. You can set
-            up your profile and subjects in the meantime — you&apos;ll appear
-            in student search once verified.
+            {teacher.verificationStatus === "PENDING"
+              ? "Your account is awaiting verification by ElimuHubKE admins. Upload a qualification document below (certificate, ID, etc.) to help admins verify you faster — you'll appear in student search once verified."
+              : "Your verification was rejected. Upload a qualification document below and an admin can review it again."}
           </CardContent>
         </Card>
       )}
@@ -53,6 +58,20 @@ export default async function TeacherProfilePage() {
         </CardHeader>
         <CardContent>
           <ProfileForm bio={teacher.bio} mpesaPayoutPhone={teacher.mpesaPayoutPhone} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Qualification documents</CardTitle>
+          <CardDescription>
+            Upload certificates, ID, or other credentials for admins to review
+            before verifying your account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <UploadQualificationForm />
+          <QualificationList qualifications={teacher.qualifications} />
         </CardContent>
       </Card>
 

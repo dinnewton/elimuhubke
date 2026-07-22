@@ -9,7 +9,7 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 
-export type StorageCategory = "documents" | "exercises" | "submissions";
+export type StorageCategory = "documents" | "exercises" | "submissions" | "qualifications";
 
 const R2_BUCKET = process.env.R2_BUCKET_NAME;
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;

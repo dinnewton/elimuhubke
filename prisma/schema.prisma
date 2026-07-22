@@ -123,11 +123,12 @@ model TeacherProfile {
   ratingAverage         Float                      @default(0)
   ratingCount            Int                       @default(0)
 
-  subjects     TeacherSubject[]
-  availability Availability[]
-  bookings     Booking[]
-  documents    Document[]
-  payouts      Payout[]
+  subjects       TeacherSubject[]
+  availability   Availability[]
+  bookings       Booking[]
+  documents      Document[]
+  payouts        Payout[]
+  qualifications QualificationDocument[]
 
   createdAt DateTime @default(now())
 }
@@ -244,6 +245,21 @@ model ExerciseSubmission {
   createdAt DateTime @default(now())
 
   @@index([exerciseId])
+}
+
+// ---------- Teacher qualification documents (admin verification evidence) ----------
+
+model QualificationDocument {
+  id            String         @id @default(cuid())
+  teacherId     String
+  teacher       TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  title         String
+  fileUrl       String // storage path
+  fileSizeBytes Int
+
+  createdAt DateTime @default(now())
+
+  @@index([teacherId])
 }
 
 // ---------- Document marketplace ----------
