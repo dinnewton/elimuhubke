@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { LogOut, User } from "lucide-react";
 import { logoutAction } from "@/lib/actions/auth-actions";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -21,6 +22,8 @@ function initials(name: string) {
 }
 
 export function UserMenu({ userName }: { userName: string }) {
+  const [isPending, startTransition] = useTransition();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
@@ -38,8 +41,11 @@ export function UserMenu({ userName }: { userName: string }) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
-          onSelect={() => {
-            logoutAction();
+          disabled={isPending}
+          onClick={() => {
+            startTransition(() => {
+              logoutAction();
+            });
           }}
         >
           <LogOut className="h-4 w-4" />
