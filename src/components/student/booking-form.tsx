@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Wallet } from "lucide-react";
 import { createBookingAction } from "@/lib/actions/booking-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -73,7 +74,7 @@ export function BookingForm({
           {slots.map((slot, i) => (
             <label
               key={slot.id}
-              className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-checked:border-primary has-checked:bg-primary/5"
+              className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm transition-colors has-checked:border-primary has-checked:bg-primary/5 hover:border-primary/40"
             >
               <input
                 type="radio"
@@ -100,7 +101,8 @@ export function BookingForm({
 
       {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
 
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" className="w-full gap-2" disabled={pending}>
+        <Wallet className="h-4 w-4" />
         {pending ? "Starting M-Pesa payment..." : "Book & pay via M-Pesa"}
       </Button>
     </form>

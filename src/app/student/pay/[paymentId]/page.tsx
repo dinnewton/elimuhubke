@@ -39,9 +39,11 @@ export default async function PaymentStatusPage({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between rounded-lg bg-secondary p-4">
-            <span className="text-sm text-muted-foreground">Amount</span>
-            <span className="font-semibold">{formatKES(payment.amountKES)}</span>
+          <div className="flex items-center justify-between rounded-lg bg-amber-100 p-4 dark:bg-amber-500/15">
+            <span className="text-sm text-amber-700/80 dark:text-amber-300/80">Amount</span>
+            <span className="font-semibold text-amber-700 dark:text-amber-300">
+              {formatKES(payment.amountKES)}
+            </span>
           </div>
           {payment.booking && (
             <p className="text-sm text-muted-foreground">

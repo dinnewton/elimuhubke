@@ -32,7 +32,9 @@ export function PaymentStatusPanel({
   if (status === "SUCCESS") {
     return (
       <div className="flex flex-col items-center gap-3 py-6 text-center">
-        <CheckCircle2 className="h-12 w-12 text-primary" />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-500/15">
+          <CheckCircle2 className="h-9 w-9 text-emerald-600 dark:text-emerald-400" />
+        </span>
         <p className="text-lg font-semibold">Payment received</p>
         <p className="text-sm text-muted-foreground">
           Your payment was confirmed via M-Pesa.
@@ -44,7 +46,9 @@ export function PaymentStatusPanel({
   if (status === "FAILED") {
     return (
       <div className="flex flex-col items-center gap-3 py-6 text-center">
-        <XCircle className="h-12 w-12 text-destructive" />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-500/15">
+          <XCircle className="h-9 w-9 text-red-600 dark:text-red-400" />
+        </span>
         <p className="text-lg font-semibold">Payment failed</p>
         <p className="text-sm text-muted-foreground">
           The M-Pesa request wasn&apos;t completed. You can try again.
@@ -61,7 +65,9 @@ export function PaymentStatusPanel({
 
   return (
     <div className="flex flex-col items-center gap-3 py-6 text-center">
-      <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+        <Loader2 className="h-9 w-9 animate-spin text-primary" />
+      </span>
       <p className="text-lg font-semibold">Waiting for M-Pesa confirmation</p>
       <p className="flex items-center gap-2 text-sm text-muted-foreground">
         <Smartphone className="h-4 w-4" /> Check your phone and enter your M-Pesa PIN.

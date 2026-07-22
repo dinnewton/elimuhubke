@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { Wallet } from "lucide-react";
 import { purchaseDocumentAction } from "@/lib/actions/document-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,8 @@ export function PurchaseDocumentForm({
         <FieldError messages={state?.fieldErrors?.phone} />
       </div>
       {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" className="w-full gap-2" disabled={pending}>
+        <Wallet className="h-4 w-4" />
         {pending ? "Starting M-Pesa payment..." : "Buy via M-Pesa"}
       </Button>
     </form>

@@ -1,10 +1,13 @@
 import { notFound } from "next/navigation";
+import { BookOpen, CheckCircle2 } from "lucide-react";
 import { db } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { CurriculumBadge } from "@/components/curriculum-badge";
 import { PurchaseDocumentForm } from "@/components/student/purchase-document-form";
-import { curriculumLabel, formatKES } from "@/lib/format";
+import { CURRICULUM_COLORS } from "@/lib/colors";
+import { formatKES } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 export default async function DocumentDetailPage({
   params,
@@ -31,10 +34,20 @@ export default async function DocumentDetailPage({
   return (
     <div className="mx-auto grid max-w-3xl gap-6 lg:grid-cols-[2fr_1fr]">
       <div className="space-y-4">
-        <Badge variant="secondary">
-          {curriculumLabel(document.subject.curriculum)} · {document.subject.name} ·{" "}
-          {document.subject.gradeLevel}
-        </Badge>
+        <span
+          className={cn(
+            "flex h-14 w-14 items-center justify-center rounded-2xl",
+            CURRICULUM_COLORS[document.subject.curriculum].badge
+          )}
+        >
+          <BookOpen className="h-7 w-7" />
+        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <CurriculumBadge curriculum={document.subject.curriculum} />
+          <span className="text-sm text-muted-foreground">
+            {document.subject.name} · {document.subject.gradeLevel}
+          </span>
+        </div>
         <h1 className="text-2xl font-semibold tracking-tight">{document.title}</h1>
         <p className="text-sm text-muted-foreground">by {document.teacher.user.name}</p>
         {document.description && (
@@ -42,19 +55,25 @@ export default async function DocumentDetailPage({
         )}
       </div>
 
-      <Card className="h-fit">
+      <Card className="h-fit overflow-hidden">
+        <div className="h-1.5 w-full bg-amber-400" />
         <CardHeader>
-          <CardTitle className="text-base">{formatKES(document.priceKES)}</CardTitle>
+          <CardTitle className="text-2xl text-amber-600 dark:text-amber-400">
+            {formatKES(document.priceKES)}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {alreadyOwned ? (
-            <p className="text-sm text-muted-foreground">
-              You already own this — check your{" "}
-              <a href="/student/purchases" className="text-primary underline">
-                library
-              </a>
-              .
-            </p>
+            <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" />
+              <p>
+                You already own this — check your{" "}
+                <a href="/student/purchases" className="font-medium underline">
+                  library
+                </a>
+                .
+              </p>
+            </div>
           ) : (
             <PurchaseDocumentForm documentId={document.id} defaultPhone={user.phone} />
           )}

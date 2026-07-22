@@ -4,9 +4,11 @@ import { requireRole } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { CalendarClock, Star } from "lucide-react";
 import { BookingForm } from "@/components/student/booking-form";
-import { curriculumLabel } from "@/lib/format";
+import { CurriculumBadge } from "@/components/curriculum-badge";
+import { avatarColorFor, CURRICULUM_COLORS } from "@/lib/colors";
+import { cn } from "@/lib/utils";
 
 function initials(name: string) {
   return name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
@@ -44,6 +46,7 @@ export default async function TeacherDetailPage({
       id: s.subject.id,
       name: s.subject.name,
       gradeLevel: s.subject.gradeLevel,
+      curriculum: s.subject.curriculum,
       hourlyRateKES: s.subject.rateCard!.hourlyRateKES,
     }));
 
@@ -57,63 +60,87 @@ export default async function TeacherDetailPage({
       ) / 10,
   }));
 
+  const heroColor = CURRICULUM_COLORS[teacher.curricula[0]] ?? CURRICULUM_COLORS.CBC;
+
   return (
-    <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Avatar className="h-16 w-16">
-            <AvatarFallback className="bg-primary/10 text-lg font-semibold text-primary">
+    <div className="space-y-6">
+      {/* Colorful profile header */}
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-2xl border p-6 sm:p-8",
+          heroColor.badge
+        )}
+      >
+        <div className="flex flex-wrap items-center gap-5">
+          <Avatar className={cn("h-20 w-20 ring-4 ring-white/60 dark:ring-black/20")}>
+            <AvatarFallback className={cn("text-xl font-semibold", avatarColorFor(teacher.user.name))}>
               {initials(teacher.user.name)}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               {teacher.user.name}
             </h1>
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Star className="h-4 w-4 fill-accent text-accent" />
+            <div className="mt-1 flex items-center gap-1 text-sm">
+              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
               {teacher.ratingCount > 0 ? teacher.ratingAverage.toFixed(1) : "New teacher"}
+              {teacher.ratingCount > 0 && (
+                <span className="opacity-70">({teacher.ratingCount} reviews)</span>
+              )}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {teacher.curricula.map((c) => (
+                <CurriculumBadge key={c} curriculum={c} className="bg-white/70 dark:bg-black/20" />
+              ))}
             </div>
           </div>
         </div>
+      </div>
 
-        {teacher.bio && (
+      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+        <div className="space-y-6">
+          {teacher.bio && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">About</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">{teacher.bio}</p>
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">About</CardTitle>
+              <CardTitle className="text-base">Subjects &amp; rates</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{teacher.bio}</p>
+            <CardContent className="flex flex-wrap gap-2">
+              {subjectsWithRates.map((s) => (
+                <Badge key={s.id} className={CURRICULUM_COLORS[s.curriculum].badge}>
+                  {s.name} · {s.gradeLevel} · KES {s.hourlyRateKES}/hr
+                </Badge>
+              ))}
             </CardContent>
           </Card>
-        )}
+        </div>
 
-        <Card>
+        <Card className="h-fit overflow-hidden">
+          <div className={cn("h-1.5 w-full", heroColor.solid)} />
           <CardHeader>
-            <CardTitle className="text-base">Subjects &amp; rates</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <CalendarClock className="h-4 w-4 text-primary" />
+              Book a session
+            </CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2">
-            {subjectsWithRates.map((s) => (
-              <Badge key={s.id} variant="secondary">
-                {s.name} · {s.gradeLevel} · KES {s.hourlyRateKES}/hr
-              </Badge>
-            ))}
+          <CardContent>
+            <BookingForm
+              subjects={subjectsWithRates}
+              slots={slotsWithDuration}
+              defaultPhone={user.phone}
+            />
           </CardContent>
         </Card>
       </div>
-
-      <Card className="h-fit">
-        <CardHeader>
-          <CardTitle className="text-base">Book a session</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <BookingForm
-            subjects={subjectsWithRates}
-            slots={slotsWithDuration}
-            defaultPhone={user.phone}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 }

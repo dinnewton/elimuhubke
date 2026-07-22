@@ -5,9 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Star } from "lucide-react";
+import { Search, Star } from "lucide-react";
+import { CurriculumBadge } from "@/components/curriculum-badge";
+import { EmptyState } from "@/components/empty-state";
+import { avatarColorFor, CURRICULUM_COLORS } from "@/lib/colors";
 import { curriculumLabel } from "@/lib/format";
 import { CURRICULA } from "@/lib/validation";
+import { cn } from "@/lib/utils";
 import type { Curriculum } from "@/generated/prisma/client";
 
 function initials(name: string) {
@@ -45,63 +49,95 @@ export default async function BrowseTeachersPage({
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Find a teacher</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {teachers.length} verified teacher{teachers.length === 1 ? "" : "s"}
+          {teachers.length} verified teacher{teachers.length === 1 ? "" : "s"} ready to help
         </p>
       </div>
 
-      <form method="get" className="flex flex-wrap gap-3 rounded-lg border p-4">
-        <select
-          name="curriculum"
-          defaultValue={curriculum ?? ""}
-          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+      {/* Colorful curriculum quick-filter pills */}
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/student/teachers"
+          className={cn(
+            "rounded-full border px-3 py-1.5 text-sm font-medium transition",
+            !curriculum
+              ? "border-primary bg-primary text-primary-foreground"
+              : "border-border hover:bg-muted"
+          )}
         >
-          <option value="">All curricula</option>
-          {CURRICULA.map((c) => (
-            <option key={c} value={c}>
-              {curriculumLabel(c)}
-            </option>
-          ))}
-        </select>
-        <select
-          name="subjectId"
-          defaultValue={params.subjectId ?? ""}
-          className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-        >
-          <option value="">All subjects</option>
-          {subjects.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.name} · {s.gradeLevel}
-            </option>
-          ))}
-        </select>
-        <Button type="submit" size="sm">
+          All
+        </Link>
+        {CURRICULA.map((c) => (
+          <Link
+            key={c}
+            href={`/student/teachers?curriculum=${c}`}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-sm font-medium transition",
+              curriculum === c
+                ? `border-transparent ${CURRICULUM_COLORS[c].solid} text-white`
+                : `border-border ${CURRICULUM_COLORS[c].badge} border-transparent`
+            )}
+          >
+            {curriculumLabel(c)}
+          </Link>
+        ))}
+      </div>
+
+      <form method="get" className="flex flex-wrap items-end gap-3 rounded-xl border bg-secondary/30 p-4">
+        <input type="hidden" name="curriculum" value={curriculum ?? ""} />
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Subject</label>
+          <select
+            name="subjectId"
+            defaultValue={params.subjectId ?? ""}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="">All subjects</option>
+            {subjects.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} · {s.gradeLevel}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button type="submit" size="sm" className="gap-1.5">
+          <Search className="h-3.5 w-3.5" />
           Filter
         </Button>
       </form>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {teachers.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No teachers match those filters yet.
-          </p>
+          <div className="sm:col-span-2 lg:col-span-3">
+            <EmptyState
+              icon={Search}
+              title="No teachers match those filters"
+              description="Try a different curriculum or subject, or check back soon as more teachers join."
+              action={
+                <Button size="sm" variant="outline" render={<Link href="/student/teachers" />}>
+                  Clear filters
+                </Button>
+              }
+            />
+          </div>
         )}
         {teachers.map((teacher) => (
           <Link key={teacher.id} href={`/student/teachers/${teacher.id}`}>
-            <Card className="h-full transition hover:border-primary hover:shadow-md">
+            <Card className="h-full overflow-hidden transition hover:-translate-y-0.5 hover:border-primary hover:shadow-lg">
+              <div className={cn("h-1.5 w-full", CURRICULUM_COLORS[teacher.curricula[0]]?.solid ?? "bg-primary")} />
               <CardContent className="space-y-3 p-5">
                 <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  <Avatar className="h-11 w-11">
+                    <AvatarFallback className={cn("font-semibold", avatarColorFor(teacher.user.name))}>
                       {initials(teacher.user.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <p className="font-medium">{teacher.user.name}</p>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                       {teacher.ratingCount > 0
                         ? teacher.ratingAverage.toFixed(1)
-                        : "New"}
+                        : "New teacher"}
                     </div>
                   </div>
                 </div>
@@ -111,9 +147,12 @@ export default async function BrowseTeachersPage({
                   </p>
                 )}
                 <div className="flex flex-wrap gap-1.5">
-                  {teacher.subjects.slice(0, 4).map(({ subject }) => (
-                    <Badge key={subject.id} variant="secondary">
-                      {curriculumLabel(subject.curriculum)} · {subject.name}
+                  {teacher.curricula.map((c) => (
+                    <CurriculumBadge key={c} curriculum={c} />
+                  ))}
+                  {teacher.subjects.slice(0, 3).map(({ subject }) => (
+                    <Badge key={subject.id} variant="outline">
+                      {subject.name}
                     </Badge>
                   ))}
                 </div>
