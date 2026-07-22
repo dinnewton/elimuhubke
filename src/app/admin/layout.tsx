@@ -3,7 +3,9 @@ import { DashboardShell, type NavItem } from "@/components/dashboard/dashboard-s
 
 const navItems: NavItem[] = [
   { href: "/admin", label: "Overview" },
+  { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/teachers", label: "Teachers" },
+  { href: "/admin/students", label: "Students" },
   { href: "/admin/subjects", label: "Subjects & rates" },
   { href: "/admin/payouts", label: "Payouts" },
   { href: "/admin/settings", label: "Settings" },

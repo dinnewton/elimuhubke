@@ -65,6 +65,9 @@ export default async function AdminOverviewPage() {
           <CardTitle className="text-base">Quick links</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-3">
+          <Button variant="outline" render={<Link href="/admin/analytics" />}>
+            View analytics
+          </Button>
           <Button variant="outline" render={<Link href="/admin/subjects" />}>
             Manage subjects &amp; rates
           </Button>

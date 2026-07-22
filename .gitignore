@@ -45,3 +45,9 @@ next-env.d.ts
 
 # uploaded teacher documents (local disk storage for MVP)
 /uploads
+
+.vercel
+.env*
+
+# Claude Code session state
+.claude/
